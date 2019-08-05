@@ -148,6 +148,12 @@ class View {
       });
     }
   }
+
+  bindEvents(controller) {
+    this.form.addEventListener("submit", controller.handleAddTodo);
+    this.todoList.addEventListener("click", controller.handleDeleteTodo);
+    this.todoList.addEventListener("change", controller.handleToggle);
+  }
 }
 
 export default View;
