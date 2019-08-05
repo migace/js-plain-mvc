@@ -83,7 +83,7 @@ class View {
   }
 
   get todoText() {
-    return this.input.value;
+    return this.input.querySelector("input").value;
   }
 
   resetInput() {
