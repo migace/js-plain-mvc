@@ -4,9 +4,7 @@ class View {
   app: HTMLElement;
   title: HTMLElement;
   form: HTMLElement;
-  inputContainer: HTMLElement;
-  inputWrapper: HTMLElement;
-  input: HTMLInputElement;
+  input: HTMLElement;
   submitButtonWrapper: HTMLElement;
   submitButton: HTMLElement;
   todoList: HTMLElement;
@@ -19,14 +17,7 @@ class View {
 
     this.form = this.createElement("form");
 
-    this.inputContainer = this.createElement("div", "field");
-    this.inputWrapper = this.createElement("div", "control");
-    this.input = this.createElement("input", "input") as HTMLInputElement;
-    this.input.type = "text";
-    this.input.placeholder = "Add todo";
-    this.input.name = "todo";
-    this.inputWrapper.append(this.input);
-    this.inputContainer.append(this.inputWrapper);
+    this.input = this.createInputElement("todo", "Add todo");
 
     this.submitButtonWrapper = this.createElement("div", "is-clipped");
     this.submitButton = this.createElement("button", "button");
@@ -37,15 +28,48 @@ class View {
 
     this.todoList = this.createElement("ul", "todo-list");
 
-    this.form.append(this.inputContainer, this.submitButtonWrapper);
+    this.form.append(this.input, this.submitButtonWrapper);
     this.app.append(this.title, this.form, this.todoList);
-
-    this.displayTodos();
   }
   createElement(tag: string, className?: string): HTMLElement {
     const element = document.createElement(tag);
 
     if (className) this.addClass(element, className);
+
+    return element;
+  }
+
+  createInputElement(
+    name: string,
+    placeholder: string,
+    type: string = "text",
+    className: string = "input"
+  ): HTMLElement {
+    const inputContainer: HTMLElement = this.createElement("div", "field");
+    const inputWrapper: HTMLElement = this.createElement("div", "control");
+    const input: HTMLInputElement = this.createElement(
+      "input",
+      className
+    ) as HTMLInputElement;
+    input.type = type;
+    input.placeholder = placeholder;
+    input.name = name;
+    inputWrapper.append(input);
+    inputContainer.append(inputWrapper);
+
+    return inputContainer;
+  }
+
+  createWrapper(
+    children: HTMLElement[],
+    tag: string = "div",
+    className: string = "field",
+    grouped: boolean = false
+  ) {
+    const element = this.createElement(tag, className);
+    if (grouped) this.addClass(element, "is-grouped");
+
+    children.forEach(child => element.append(child));
 
     return element;
   }
@@ -80,11 +104,16 @@ class View {
         const li: HTMLElement = this.createElement("li");
         li.id = String(todo.id);
 
+        const checkboxWrapper: HTMLElement = this.createElement(
+          "label",
+          "checkbox"
+        );
         const checkbox: HTMLInputElement = this.createElement(
           "input"
         ) as HTMLInputElement;
         checkbox.type = "checkbox";
         checkbox.checked = todo.completed;
+        checkboxWrapper.append(checkbox);
 
         const span: HTMLElement = this.createElement("span", "editable");
         span.contentEditable = String(true);
@@ -103,7 +132,18 @@ class View {
         );
         deleteButton.textContent = "Delete";
 
-        li.append(checkbox, span, deleteButton);
+        li.append(
+          this.createWrapper(
+            [
+              this.createWrapper([checkboxWrapper], "p", "control"),
+              this.createWrapper([span], "p", "control"),
+              this.createWrapper([deleteButton], "p", "control")
+            ],
+            "div",
+            "field",
+            true
+          )
+        );
         this.todoList.append(li);
       });
     }
